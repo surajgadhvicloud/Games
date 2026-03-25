@@ -8,6 +8,7 @@ namespace BoardGamesLibrary.Tests.Integration;
 public class RefreshTokenFlowIntegrationTests : IClassFixture<TestWebApplicationFactory>
 {
     private const string Password = "P@ssw0rd123";
+    private const string NewPassword = "N3wP@ssw0rd!";
     private readonly TestWebApplicationFactory _factory;
 
     public RefreshTokenFlowIntegrationTests(TestWebApplicationFactory factory)
@@ -47,5 +48,25 @@ public class RefreshTokenFlowIntegrationTests : IClassFixture<TestWebApplication
 
         var refreshResponse = await client.PostAsJsonAsync("/api/auth/refresh", new RefreshTokenRequest(login.RefreshToken));
         Assert.Equal(HttpStatusCode.Conflict, refreshResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task ResetPassword_RequiresAuth_AndInvalidatesOldPassword()
+    {
+        using var client = _factory.CreateClient();
+
+        var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("dataentry", Password));
+        loginResponse.EnsureSuccessStatusCode();
+        var login = await loginResponse.Content.ReadFromJsonAsync<LoginResponse>();
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", login!.AccessToken);
+        var resetResponse = await client.PostAsJsonAsync("/api/auth/reset-password", new ResetPasswordRequest(Password, NewPassword));
+        Assert.Equal(HttpStatusCode.NoContent, resetResponse.StatusCode);
+
+        var oldPasswordLogin = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("dataentry", Password));
+        Assert.Equal(HttpStatusCode.Conflict, oldPasswordLogin.StatusCode);
+
+        var newPasswordLogin = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("dataentry", NewPassword));
+        Assert.Equal(HttpStatusCode.OK, newPasswordLogin.StatusCode);
     }
 }

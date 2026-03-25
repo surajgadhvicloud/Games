@@ -21,3 +21,7 @@ public sealed record RefreshTokenResponse(
     DateTime RefreshTokenExpiresAtUtc);
 
 public sealed record RevokeTokenRequest(string RefreshToken);
+
+public sealed record ResetPasswordRequest(
+    string CurrentPassword,
+    string NewPassword);

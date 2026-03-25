@@ -17,13 +17,14 @@ namespace BoardGamesLibrary.Infrastructure.Services;
 public class AuthService(
     BoardGamesDbContext dbContext,
     IOptions<JwtOptions> jwtOptions,
+    ICurrentUserService currentUserService,
     IPasswordHasher<User> passwordHasher) : IAuthService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken)
     {
-        var username = request.Username.Trim();
+        var username = NormalizeUsername(request.Username);
 
         var user = await dbContext.Users.FirstOrDefaultAsync(
             x => x.Username == username,
@@ -88,6 +89,34 @@ public class AuthService(
         }
     }
 
+    public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        var username = NormalizeUsername(currentUserService.GetUsername());
+        var user = await dbContext.Users
+            .Include(x => x.RefreshTokens)
+            .FirstOrDefaultAsync(x => x.Username == username, cancellationToken)
+            ?? throw new KeyNotFoundException("User was not found.");
+
+        var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+        if (verification == PasswordVerificationResult.Failed)
+        {
+            throw new InvalidOperationException("Current password is incorrect.");
+        }
+
+        user.PasswordHash = passwordHasher.HashPassword(user, request.NewPassword);
+        user.UpdatedAtUtc = DateTime.UtcNow;
+        user.ModifiedByUser = username;
+
+        var now = DateTime.UtcNow;
+        foreach (var token in user.RefreshTokens.Where(x => !x.RevokedAtUtc.HasValue && x.ExpiresAtUtc > now))
+        {
+            token.RevokedAtUtc = now;
+            token.RevokeReason = "password-reset";
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task<(string AccessToken, DateTime AccessTokenExpiresAtUtc, string RefreshToken, DateTime RefreshTokenExpiresAtUtc)> IssueTokenPairAsync(
         User user,
         CancellationToken cancellationToken)
@@ -135,4 +164,7 @@ public class AuthService(
         var bytes = RandomNumberGenerator.GetBytes(64);
         return Convert.ToBase64String(bytes);
     }
+
+    private static string NormalizeUsername(string username) =>
+        username.Trim().ToLowerInvariant();
 }

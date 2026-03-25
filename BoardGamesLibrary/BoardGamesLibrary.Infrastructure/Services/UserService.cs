@@ -15,7 +15,7 @@ public class UserService(
 	public async Task<UserResponse> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken)
 	{
 		var email = request.Email.Trim().ToLowerInvariant();
-		var username = request.Username.Trim();
+		var username = NormalizeUsername(request.Username);
 
 		var emailExists = await dbContext.Users.AnyAsync(x => x.Email == email, cancellationToken);
 		if (emailExists)
@@ -53,7 +53,7 @@ public class UserService(
 			?? throw new KeyNotFoundException($"User {id} was not found.");
 
 		var email = request.Email.Trim().ToLowerInvariant();
-		var username = request.Username.Trim();
+		var username = NormalizeUsername(request.Username);
 
 		var emailExists = await dbContext.Users.AnyAsync(x => x.Email == email && x.Id != id, cancellationToken);
 		if (emailExists)
@@ -101,4 +101,7 @@ public class UserService(
 
 	private static UserResponse ToResponse(User entity) =>
 		new(entity.Id, entity.FirstName, entity.LastName, entity.Email, entity.Username, entity.Role);
+
+	private static string NormalizeUsername(string username) =>
+		username.Trim().ToLowerInvariant();
 }

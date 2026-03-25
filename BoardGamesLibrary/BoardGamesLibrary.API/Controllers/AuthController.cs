@@ -32,4 +32,12 @@ public class AuthController(IAuthService authService) : ControllerBase
         await authService.RevokeAsync(request, cancellationToken);
         return NoContent();
     }
+
+    [Authorize]
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await authService.ResetPasswordAsync(request, cancellationToken);
+        return NoContent();
+    }
 }

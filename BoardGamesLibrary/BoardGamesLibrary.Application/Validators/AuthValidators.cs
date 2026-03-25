@@ -27,3 +27,15 @@ public class RevokeTokenRequestValidator : AbstractValidator<RevokeTokenRequest>
         RuleFor(x => x.RefreshToken).NotEmpty().MaximumLength(300);
     }
 }
+
+public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
+{
+    public ResetPasswordRequestValidator()
+    {
+        RuleFor(x => x.CurrentPassword).NotEmpty().MaximumLength(200);
+        RuleFor(x => x.NewPassword).NotEmpty().MinimumLength(6).MaximumLength(200);
+        RuleFor(x => x.NewPassword)
+            .NotEqual(x => x.CurrentPassword)
+            .WithMessage("New password must be different from current password.");
+    }
+}
