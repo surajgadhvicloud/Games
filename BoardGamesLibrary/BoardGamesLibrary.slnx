@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="BoardGamesLibrary.API/BoardGamesLibrary.API.csproj" />
+  <Project Path="BoardGamesLibrary.Application/BoardGamesLibrary.Application.csproj" />
+  <Project Path="BoardGamesLibrary.Domain/BoardGamesLibrary.Domain.csproj" />
+  <Project Path="BoardGamesLibrary.Infrastructure/BoardGamesLibrary.Infrastructure.csproj" />
+  <Project Path="BoardGamesLibrary.Tests/BoardGamesLibrary.Tests.csproj" />
+</Solution>
