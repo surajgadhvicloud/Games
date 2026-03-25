@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "TqIevD/ZRY4=",
+  "dgSpecHash": "/XGggL/rKAg=",
   "success": true,
   "projectFilePath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.25\\microsoft.netcore.app.ref.8.0.25.nupkg.sha512",
-    "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.25\\microsoft.windowsdesktop.app.ref.8.0.25.nupkg.sha512",
-    "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.25\\microsoft.aspnetcore.app.ref.8.0.25.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }
