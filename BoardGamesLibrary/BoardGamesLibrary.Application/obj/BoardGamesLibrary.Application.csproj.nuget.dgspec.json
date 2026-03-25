@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj": {}
+    "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj": {}
   },
   "projects": {
-    "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj": {
+    "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj",
+        "projectUniqueName": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj",
         "projectName": "BoardGamesLibrary.Application",
-        "projectPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj",
+        "projectPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Application\\BoardGamesLibrary.Application.csproj",
         "packagesPath": "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Application\\obj\\",
+        "outputPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj": {
-                "projectPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj"
+              "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj": {
+                "projectPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj"
               }
             }
           }
@@ -79,14 +79,14 @@
         }
       }
     },
-    "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj": {
+    "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
+        "projectUniqueName": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
         "projectName": "BoardGamesLibrary.Domain",
-        "projectPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
+        "projectPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
         "packagesPath": "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\",
-        "outputPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\obj\\",
+        "outputPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "i4aOsb+JNrU=",
+  "dgSpecHash": "O7R69ftB12E=",
   "success": true,
-  "projectFilePath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Infrastructure\\BoardGamesLibrary.Infrastructure.csproj",
+  "projectFilePath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Infrastructure\\BoardGamesLibrary.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

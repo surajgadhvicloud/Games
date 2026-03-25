@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
+      "projectUniqueName": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
       "projectName": "BoardGamesLibrary.Domain",
-      "projectPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
+      "projectPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\BoardGamesLibrary.Domain.csproj",
       "packagesPath": "C:\\Users\\Gayathiri Deepthi M\\.nuget\\packages\\",
-      "outputPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\obj\\",
+      "outputPath": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

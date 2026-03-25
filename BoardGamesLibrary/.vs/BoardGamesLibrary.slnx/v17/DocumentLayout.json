@@ -1,7 +1,16 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Code\\AIDevelopment\\BoardGamesLibrary\\",
-  "Documents": [],
+  "WorkspaceRootPath": "C:\\Code\\Games\\BoardGamesLibrary\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{F3B57E79-4A28-2866-A0F7-C691E77F8173}|BoardGamesLibrary.API\\BoardGamesLibrary.API.csproj|c:\\code\\games\\boardgameslibrary\\boardgameslibrary.api\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F3B57E79-4A28-2866-A0F7-C691E77F8173}|BoardGamesLibrary.API\\BoardGamesLibrary.API.csproj|solutionrelative:boardgameslibrary.api\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{503A6057-E048-47EB-D3AC-04A87DD06559}|BoardGamesLibrary.Tests\\BoardGamesLibrary.Tests.csproj|c:\\code\\games\\boardgameslibrary\\boardgameslibrary.tests\\memberinventoryservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{503A6057-E048-47EB-D3AC-04A87DD06559}|BoardGamesLibrary.Tests\\BoardGamesLibrary.Tests.csproj|solutionrelative:boardgameslibrary.tests\\memberinventoryservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,11 +18,33 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 0,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.API\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "BoardGamesLibrary.API\\Controllers\\UsersController.cs",
+              "ToolTip": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.API\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "BoardGamesLibrary.API\\Controllers\\UsersController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T08:25:00.882Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MemberInventoryServiceTests.cs",
+              "DocumentMoniker": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Tests\\MemberInventoryServiceTests.cs",
+              "RelativeDocumentMoniker": "BoardGamesLibrary.Tests\\MemberInventoryServiceTests.cs",
+              "ToolTip": "C:\\Code\\Games\\BoardGamesLibrary\\BoardGamesLibrary.Tests\\MemberInventoryServiceTests.cs",
+              "RelativeToolTip": "BoardGamesLibrary.Tests\\MemberInventoryServiceTests.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAUwDsAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-25T08:24:46.677Z",
+              "EditorCaption": ""
             }
           ]
         }
