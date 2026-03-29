@@ -1,1 +1,4 @@
-﻿
+﻿# Copilot custom agents (keep local; do not commit)
+**/*.agent.md
+.github/agents/
+.github/prompts/Readme-update.prompt.md
