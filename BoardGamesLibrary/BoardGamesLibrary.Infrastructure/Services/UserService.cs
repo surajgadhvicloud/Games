@@ -84,12 +84,19 @@ public class UserService(
 		return ToResponse(entity);
 	}
 
-	public async Task<IReadOnlyList<UserResponse>> ListAsync(CancellationToken cancellationToken)
+	public async Task<PagedResult<UserResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
 	{
-		return await dbContext.Users
-			.OrderBy(x => x.Username)
+		var query = dbContext.Users
+			.OrderBy(x => x.Username);
+
+		var totalCount = await query.CountAsync(cancellationToken);
+		var items = await query
+			.Skip((page - 1) * pageSize)
+			.Take(pageSize)
 			.Select(x => ToResponse(x))
 			.ToListAsync(cancellationToken);
+
+		return new PagedResult<UserResponse>(items, totalCount, page, pageSize);
 	}
 
 	public async Task<UserResponse> GetAsync(int id, CancellationToken cancellationToken)

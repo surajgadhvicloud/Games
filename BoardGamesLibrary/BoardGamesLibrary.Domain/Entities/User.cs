@@ -1,4 +1,4 @@
-using BoardGamesLibrary.Domain.Enums;
+ using BoardGamesLibrary.Domain.Enums;
 
 namespace BoardGamesLibrary.Domain.Entities;
 

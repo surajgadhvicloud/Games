@@ -59,13 +59,20 @@ public class MemberService(BoardGamesDbContext dbContext, ICurrentUserService cu
         return ToResponse(entity);
     }
 
-    public async Task<IReadOnlyList<MemberResponse>> ListAsync(CancellationToken cancellationToken)
+    public async Task<PagedResult<MemberResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        return await dbContext.Members
+        var query = dbContext.Members
             .OrderBy(x => x.FirstName)
-            .ThenBy(x => x.LastName)
+            .ThenBy(x => x.LastName);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<MemberResponse>(items, totalCount, page, pageSize);
     }
 
     public async Task<MemberResponse> GetAsync(int id, CancellationToken cancellationToken)

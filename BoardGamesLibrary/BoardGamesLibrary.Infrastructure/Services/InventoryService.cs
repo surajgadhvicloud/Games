@@ -60,12 +60,19 @@ public class InventoryService(BoardGamesDbContext dbContext, ICurrentUserService
         return ToResponse(entity);
     }
 
-    public async Task<IReadOnlyList<InventoryResponse>> ListAsync(CancellationToken cancellationToken)
+    public async Task<PagedResult<InventoryResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        return await dbContext.Inventories
-            .OrderBy(x => x.BoardGameId)
+        var query = dbContext.Inventories
+            .OrderBy(x => x.BoardGameId);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<InventoryResponse>(items, totalCount, page, pageSize);
     }
 
     public async Task<InventoryResponse> GetByBoardGameIdAsync(int boardGameId, CancellationToken cancellationToken)
