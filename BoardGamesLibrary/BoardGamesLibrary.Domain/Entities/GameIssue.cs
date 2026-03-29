@@ -7,6 +7,8 @@ public class GameIssue
     public int Id { get; set; }
     public int BoardGameId { get; set; }
     public int MemberId { get; set; }
+    public string? PhotoUrlBeforeIssue { get; set; }
+    public string? PhotoUrlAfterReturn { get; set; }
     public DateTime StartDateUtc { get; set; }
     public DateTime EndDateUtc { get; set; }
     public DateTime? ReturnDateUtc { get; set; }

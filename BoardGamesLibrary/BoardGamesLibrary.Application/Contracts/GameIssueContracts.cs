@@ -7,16 +7,20 @@ public sealed record CreateGameIssueRequest(
     int UserId,
     DateTime? StartDateUtc,
     DateTime? EndDateUtc,
-    GameCondition ConditionGivenOut);
+    GameCondition ConditionGivenOut,
+    string? PhotoUrlBeforeIssue = null);
 
 public sealed record UpdateGameIssueRequest(
     DateTime? ReturnDateUtc,
-    GameCondition? ConditionGivenIn);
+    GameCondition? ConditionGivenIn,
+    string? PhotoUrlAfterReturn = null);
 
 public sealed record GameIssueResponse(
     int Id,
     int BoardGameId,
     int UserId,
+    string? PhotoUrlBeforeIssue,
+    string? PhotoUrlAfterReturn,
     DateTime StartDateUtc,
     DateTime EndDateUtc,
     DateTime? ReturnDateUtc,

@@ -56,6 +56,7 @@ public class GameIssueService(
         {
             BoardGameId = request.BoardGameId,
             MemberId = request.UserId,
+            PhotoUrlBeforeIssue = request.PhotoUrlBeforeIssue?.Trim(),
             StartDateUtc = startDate,
             EndDateUtc = endDate,
             ConditionGivenOut = request.ConditionGivenOut,
@@ -94,6 +95,7 @@ public class GameIssueService(
         var returnDate = request.ReturnDateUtc ?? DateTime.UtcNow;
         issue.ReturnDateUtc = returnDate;
         issue.ConditionGivenIn = request.ConditionGivenIn;
+        issue.PhotoUrlAfterReturn = request.PhotoUrlAfterReturn?.Trim();
         issue.UpdatedAtUtc = DateTime.UtcNow;
         issue.ModifiedByUser = currentUserService.GetUsername();
 
@@ -155,6 +157,8 @@ public class GameIssueService(
             issue.Id,
             issue.BoardGameId,
             issue.MemberId,
+            issue.PhotoUrlBeforeIssue,
+            issue.PhotoUrlAfterReturn,
             issue.StartDateUtc,
             issue.EndDateUtc,
             issue.ReturnDateUtc,

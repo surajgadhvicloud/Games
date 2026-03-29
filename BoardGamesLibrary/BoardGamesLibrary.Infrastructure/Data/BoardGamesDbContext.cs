@@ -23,6 +23,7 @@ public class BoardGamesDbContext(DbContextOptions<BoardGamesDbContext> options) 
             entity.HasKey(x => x.Id);
             entity.Property(x => x.GameName).HasMaxLength(200).IsRequired();
             entity.Property(x => x.Version).HasMaxLength(100).IsRequired();
+            entity.Property(x => x.ImageUrl).HasMaxLength(2048);
             entity.Property(x => x.Price).HasPrecision(18, 2);
             entity.Property(x => x.ModifiedByUser).HasMaxLength(100);
             entity.HasIndex(x => new { x.GameName, x.Version }).IsUnique();
@@ -101,6 +102,8 @@ public class BoardGamesDbContext(DbContextOptions<BoardGamesDbContext> options) 
             });
             entity.HasKey(x => x.Id);
             entity.Property(x => x.RowVersion).IsRowVersion();
+            entity.Property(x => x.PhotoUrlBeforeIssue).HasMaxLength(2048);
+            entity.Property(x => x.PhotoUrlAfterReturn).HasMaxLength(2048);
             entity.Property(x => x.OverdueCharges).HasPrecision(18, 2);
             entity.Property(x => x.ModifiedByUser).HasMaxLength(100);
             entity.HasIndex(x => x.Status);

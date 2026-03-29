@@ -17,6 +17,7 @@ public class GameIssueServiceTests
     public async Task CreateAsync_DecrementsInventoryAndCreatesActiveIssue()
     {
         await using var harness = await TestHarness.CreateAsync();
+        const string photoBeforeIssue = "https://s3.amazonaws.com/library-bucket/games/monopoly-before.jpg";
 
         var result = await harness.Service.CreateAsync(
             new CreateGameIssueRequest(
@@ -24,13 +25,16 @@ public class GameIssueServiceTests
                 harness.RegularMemberId,
                 StartDateUtc: DateTime.UtcNow,
                 EndDateUtc: null,
-                ConditionGivenOut: GameCondition.Mint),
+                ConditionGivenOut: GameCondition.Mint,
+                PhotoUrlBeforeIssue: photoBeforeIssue),
             CancellationToken.None);
 
         var inventory = await harness.DbContext.Inventories.FirstAsync(x => x.BoardGameId == harness.BoardGameId);
 
         Assert.Equal(GameIssueStatus.Active, result.Status);
         Assert.Equal(1, inventory.AvailableInventory);
+        Assert.Equal(photoBeforeIssue, result.PhotoUrlBeforeIssue);
+        Assert.Null(result.PhotoUrlAfterReturn);
     }
 
     [Fact]
@@ -81,6 +85,7 @@ public class GameIssueServiceTests
     public async Task UpdateAsync_AppliesOverdueCharges_WhenReturnedLate()
     {
         await using var harness = await TestHarness.CreateAsync();
+        const string photoAfterReturn = "https://storageaccount.blob.core.windows.net/boardgames/monopoly-after.jpg";
         var issue = await harness.Service.CreateAsync(
             new CreateGameIssueRequest(
                 harness.BoardGameId,
@@ -94,11 +99,13 @@ public class GameIssueServiceTests
             issue.Id,
             new UpdateGameIssueRequest(
                 ReturnDateUtc: DateTime.UtcNow,
-                ConditionGivenIn: GameCondition.CompleteNotMint),
+                ConditionGivenIn: GameCondition.CompleteNotMint,
+                PhotoUrlAfterReturn: photoAfterReturn),
             CancellationToken.None);
 
         Assert.Equal(GameIssueStatus.Overdue, returned.Status);
         Assert.Equal(5 * 250m, returned.OverdueCharges);
+        Assert.Equal(photoAfterReturn, returned.PhotoUrlAfterReturn);
     }
 
     [Fact]

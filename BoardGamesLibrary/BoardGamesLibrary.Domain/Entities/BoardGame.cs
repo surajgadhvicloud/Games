@@ -7,6 +7,7 @@ public class BoardGame
     public int Id { get; set; }
     public string GameName { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
+    public string? ImageUrl { get; set; }
     public int MinPlayers { get; set; }
     public int MaxPlayers { get; set; }
     public decimal Price { get; set; }

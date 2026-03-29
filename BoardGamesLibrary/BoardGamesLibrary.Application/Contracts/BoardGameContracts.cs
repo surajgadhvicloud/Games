@@ -5,14 +5,16 @@ public sealed record CreateBoardGameRequest(
     string Version,
     int MinPlayers,
     int MaxPlayers,
-    decimal Price);
+    decimal Price,
+    string? ImageUrl = null);
 
 public sealed record UpdateBoardGameRequest(
     string GameName,
     string Version,
     int MinPlayers,
     int MaxPlayers,
-    decimal Price);
+    decimal Price,
+    string? ImageUrl = null);
 
 public sealed record BoardGameResponse(
     int Id,
@@ -20,4 +22,5 @@ public sealed record BoardGameResponse(
     string Version,
     int MinPlayers,
     int MaxPlayers,
-    decimal Price);
+    decimal Price,
+    string? ImageUrl);

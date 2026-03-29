@@ -22,6 +22,7 @@ public class BoardGameService(BoardGamesDbContext dbContext, ICurrentUserService
         {
             GameName = request.GameName.Trim(),
             Version = request.Version.Trim(),
+            ImageUrl = request.ImageUrl?.Trim(),
             MinPlayers = request.MinPlayers,
             MaxPlayers = request.MaxPlayers,
             Price = request.Price,
@@ -41,6 +42,7 @@ public class BoardGameService(BoardGamesDbContext dbContext, ICurrentUserService
 
         entity.GameName = request.GameName.Trim();
         entity.Version = request.Version.Trim();
+        entity.ImageUrl = request.ImageUrl?.Trim();
         entity.MinPlayers = request.MinPlayers;
         entity.MaxPlayers = request.MaxPlayers;
         entity.Price = request.Price;
@@ -75,5 +77,5 @@ public class BoardGameService(BoardGamesDbContext dbContext, ICurrentUserService
     }
 
     private static BoardGameResponse ToResponse(BoardGame entity) =>
-        new(entity.Id, entity.GameName, entity.Version, entity.MinPlayers, entity.MaxPlayers, entity.Price);
+        new(entity.Id, entity.GameName, entity.Version, entity.MinPlayers, entity.MaxPlayers, entity.Price, entity.ImageUrl);
 }
