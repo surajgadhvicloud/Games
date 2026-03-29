@@ -6,6 +6,6 @@ public interface IMemberService
 {
     Task<MemberResponse> CreateAsync(CreateMemberRequest request, CancellationToken cancellationToken);
     Task<MemberResponse> UpdateAsync(int id, UpdateMemberRequest request, CancellationToken cancellationToken);
-    Task<IReadOnlyList<MemberResponse>> ListAsync(CancellationToken cancellationToken);
+    Task<PagedResponse<MemberResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken);
     Task<MemberResponse> GetAsync(int id, CancellationToken cancellationToken);
 }

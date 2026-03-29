@@ -1,3 +1,6 @@
+# Agent files
+*.agent.md
+
 # Build output
 [Bb]in/
 [Oo]bj/

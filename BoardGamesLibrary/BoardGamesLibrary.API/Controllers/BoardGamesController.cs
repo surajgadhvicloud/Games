@@ -27,9 +27,11 @@ public class BoardGamesController(IBoardGameService boardGameService) : Controll
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<BoardGameResponse>>> List(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<BoardGameResponse>>> List([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        var result = await boardGameService.ListAsync(cancellationToken);
+        if (page < 1) return BadRequest("Page must be greater than or equal to 1.");
+        if (pageSize < 1 || pageSize > 100) return BadRequest("PageSize must be between 1 and 100.");
+        var result = await boardGameService.ListAsync(page, pageSize, cancellationToken);
         return Ok(result);
     }
 

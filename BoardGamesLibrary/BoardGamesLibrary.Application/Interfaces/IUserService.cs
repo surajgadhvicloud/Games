@@ -6,6 +6,6 @@ public interface IUserService
 {
 	Task<UserResponse> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken);
 	Task<UserResponse> UpdateAsync(int id, UpdateUserRequest request, CancellationToken cancellationToken);
-	Task<IReadOnlyList<UserResponse>> ListAsync(CancellationToken cancellationToken);
+	Task<PagedResponse<UserResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken);
 	Task<UserResponse> GetAsync(int id, CancellationToken cancellationToken);
 }

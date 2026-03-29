@@ -27,9 +27,11 @@ public class InventoriesController(IInventoryService inventoryService) : Control
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<InventoryResponse>>> List(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<InventoryResponse>>> List([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        var result = await inventoryService.ListAsync(cancellationToken);
+        if (page < 1) return BadRequest("Page must be greater than or equal to 1.");
+        if (pageSize < 1 || pageSize > 100) return BadRequest("PageSize must be between 1 and 100.");
+        var result = await inventoryService.ListAsync(page, pageSize, cancellationToken);
         return Ok(result);
     }
 

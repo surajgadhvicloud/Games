@@ -51,13 +51,20 @@ public class BoardGameService(BoardGamesDbContext dbContext, ICurrentUserService
         return ToResponse(entity);
     }
 
-    public async Task<IReadOnlyList<BoardGameResponse>> ListAsync(CancellationToken cancellationToken)
+    public async Task<PagedResponse<BoardGameResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        return await dbContext.BoardGames
+        var query = dbContext.BoardGames
             .OrderBy(x => x.GameName)
-            .ThenBy(x => x.Version)
+            .ThenBy(x => x.Version);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
+
+        return new PagedResponse<BoardGameResponse>(items, totalCount, page, pageSize);
     }
 
     public async Task<BoardGameResponse> GetAsync(int id, CancellationToken cancellationToken)

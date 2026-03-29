@@ -27,9 +27,11 @@ public class MembersController(IMemberService memberService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<MemberResponse>>> List(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<MemberResponse>>> List([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        var result = await memberService.ListAsync(cancellationToken);
+        if (page < 1) return BadRequest("Page must be greater than or equal to 1.");
+        if (pageSize < 1 || pageSize > 100) return BadRequest("PageSize must be between 1 and 100.");
+        var result = await memberService.ListAsync(page, pageSize, cancellationToken);
         return Ok(result);
     }
 

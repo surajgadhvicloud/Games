@@ -25,9 +25,11 @@ public class GameIssuesController(IGameIssueService gameIssueService) : Controll
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<GameIssueResponse>>> List(CancellationToken cancellationToken)
+    public async Task<ActionResult<PagedResponse<GameIssueResponse>>> List([FromQuery] int page = 1, [FromQuery] int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        var result = await gameIssueService.ListAsync(cancellationToken);
+        if (page < 1) return BadRequest("Page must be greater than or equal to 1.");
+        if (pageSize < 1 || pageSize > 100) return BadRequest("PageSize must be between 1 and 100.");
+        var result = await gameIssueService.ListAsync(page, pageSize, cancellationToken);
         return Ok(result);
     }
 
