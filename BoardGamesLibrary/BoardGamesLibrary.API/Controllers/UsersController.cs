@@ -2,6 +2,7 @@ using BoardGamesLibrary.Application.Contracts;
 using BoardGamesLibrary.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace BoardGamesLibrary.API.Controllers;
 
@@ -25,9 +26,9 @@ public class UsersController(IUserService userService) : ControllerBase
 	}
 
 	[HttpGet]
-	public async Task<ActionResult<IReadOnlyList<UserResponse>>> List(CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<UserResponse>>> List([FromQuery][Range(1, int.MaxValue)] int page = 1, [FromQuery][Range(1, 100)] int pageSize = 20, CancellationToken cancellationToken = default)
 	{
-		var result = await userService.ListAsync(cancellationToken);
+		var result = await userService.ListAsync(page, pageSize, cancellationToken);
 		return Ok(result);
 	}
 

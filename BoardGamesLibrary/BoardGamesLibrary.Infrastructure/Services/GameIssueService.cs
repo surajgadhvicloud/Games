@@ -128,12 +128,19 @@ public class GameIssueService(
         return ToResponse(issue);
     }
 
-    public async Task<IReadOnlyList<GameIssueResponse>> ListAsync(CancellationToken cancellationToken)
+    public async Task<PagedResult<GameIssueResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)
     {
-        return await dbContext.GameIssues
-            .OrderByDescending(x => x.StartDateUtc)
+        var query = dbContext.GameIssues
+            .OrderByDescending(x => x.StartDateUtc);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => ToResponse(x))
             .ToListAsync(cancellationToken);
+
+        return new PagedResult<GameIssueResponse>(items, totalCount, page, pageSize);
     }
 
     public async Task<GameIssueResponse> GetAsync(int id, CancellationToken cancellationToken)

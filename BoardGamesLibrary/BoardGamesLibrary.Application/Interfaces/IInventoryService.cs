@@ -6,6 +6,6 @@ public interface IInventoryService
 {
     Task<InventoryResponse> CreateAsync(CreateInventoryRequest request, CancellationToken cancellationToken);
     Task<InventoryResponse> UpdateAsync(int boardGameId, UpdateInventoryRequest request, CancellationToken cancellationToken);
-    Task<IReadOnlyList<InventoryResponse>> ListAsync(CancellationToken cancellationToken);
+    Task<PagedResult<InventoryResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken);
     Task<InventoryResponse> GetByBoardGameIdAsync(int boardGameId, CancellationToken cancellationToken);
 }
