@@ -12,122 +12,123 @@ namespace BoardGamesLibrary.Infrastructure.Services;
 public class GameIssueService(
     BoardGamesDbContext dbContext,
     ICurrentUserService currentUserService,
-    IOptions<BusinessRulesOptions> options) : IGameIssueService
+    IOptions<BusinessRulesOptions> options,
+    IUnitOfWork unitOfWork) : IGameIssueService
 {
     private readonly BusinessRulesOptions _businessRules = options.Value;
 
     public async Task<GameIssueResponse> CreateAsync(CreateGameIssueRequest request, CancellationToken cancellationToken)
     {
-        await using var tx = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-
-        var member = await dbContext.Members.FirstOrDefaultAsync(x => x.Id == request.UserId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Member {request.UserId} was not found.");
-        var inventory = await dbContext.Inventories.FirstOrDefaultAsync(x => x.BoardGameId == request.BoardGameId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Inventory for board game {request.BoardGameId} was not found.");
-
-        if (inventory.IsMissingOrBroken)
+        return await unitOfWork.ExecuteInTransactionAsync(async ct =>
         {
-            throw new InvalidOperationException("Game is flagged as missing or broken and cannot be issued.");
-        }
+            var member = await dbContext.Members.FirstOrDefaultAsync(x => x.Id == request.UserId, ct)
+                ?? throw new KeyNotFoundException($"Member {request.UserId} was not found.");
+            var inventory = await dbContext.Inventories.FirstOrDefaultAsync(x => x.BoardGameId == request.BoardGameId, ct)
+                ?? throw new KeyNotFoundException($"Inventory for board game {request.BoardGameId} was not found.");
 
-        if (inventory.AvailableInventory <= 0)
-        {
-            throw new InvalidOperationException("No available inventory to issue.");
-        }
+            if (inventory.IsMissingOrBroken)
+            {
+                throw new InvalidOperationException("Game is flagged as missing or broken and cannot be issued.");
+            }
 
-        var maxLimit = member.TypeOfUser == UserType.Premium
-            ? _businessRules.PremiumMaxActiveIssues
-            : _businessRules.RegularMaxActiveIssues;
+            if (inventory.AvailableInventory <= 0)
+            {
+                throw new InvalidOperationException("No available inventory to issue.");
+            }
 
-        var activeIssueCount = await dbContext.GameIssues
-            .CountAsync(x => x.MemberId == member.Id && x.ReturnDateUtc == null, cancellationToken);
-        if (activeIssueCount >= maxLimit)
-        {
-            throw new InvalidOperationException($"Member reached max active issue limit ({maxLimit}).");
-        }
+            var maxLimit = member.TypeOfUser == UserType.Premium
+                ? _businessRules.PremiumMaxActiveIssues
+                : _businessRules.RegularMaxActiveIssues;
 
-        var startDate = request.StartDateUtc ?? DateTime.UtcNow;
-        var endDate = request.EndDateUtc ?? startDate.AddDays(
-            member.TypeOfUser == UserType.Premium
-                ? _businessRules.PremiumLoanDays
-                : _businessRules.RegularLoanDays);
+            var activeIssueCount = await dbContext.GameIssues
+                .CountAsync(x => x.MemberId == member.Id && x.ReturnDateUtc == null, ct);
+            if (activeIssueCount >= maxLimit)
+            {
+                throw new InvalidOperationException($"Member reached max active issue limit ({maxLimit}).");
+            }
 
-        var issue = new GameIssue
-        {
-            BoardGameId = request.BoardGameId,
-            MemberId = request.UserId,
-            PhotoUrlBeforeIssue = request.PhotoUrlBeforeIssue?.Trim(),
-            StartDateUtc = startDate,
-            EndDateUtc = endDate,
-            ConditionGivenOut = request.ConditionGivenOut,
-            Status = GameIssueStatus.Active,
-            OverdueCharges = 0,
-            CreatedAtUtc = DateTime.UtcNow,
-            ModifiedByUser = currentUserService.GetUsername()
-        };
+            var startDate = request.StartDateUtc ?? DateTime.UtcNow;
+            var endDate = request.EndDateUtc ?? startDate.AddDays(
+                member.TypeOfUser == UserType.Premium
+                    ? _businessRules.PremiumLoanDays
+                    : _businessRules.RegularLoanDays);
 
-        inventory.AvailableInventory -= 1;
-        inventory.UpdatedAtUtc = DateTime.UtcNow;
-        inventory.ModifiedByUser = currentUserService.GetUsername();
+            var issue = new GameIssue
+            {
+                BoardGameId = request.BoardGameId,
+                MemberId = request.UserId,
+                PhotoUrlBeforeIssue = request.PhotoUrlBeforeIssue?.Trim(),
+                StartDateUtc = startDate,
+                EndDateUtc = endDate,
+                ConditionGivenOut = request.ConditionGivenOut,
+                Status = GameIssueStatus.Active,
+                OverdueCharges = 0,
+                CreatedAtUtc = DateTime.UtcNow,
+                ModifiedByUser = currentUserService.GetUsername()
+            };
 
-        dbContext.GameIssues.Add(issue);
-        await dbContext.SaveChangesAsync(cancellationToken);
-        await tx.CommitAsync(cancellationToken);
+            inventory.AvailableInventory -= 1;
+            inventory.UpdatedAtUtc = DateTime.UtcNow;
+            inventory.ModifiedByUser = currentUserService.GetUsername();
 
-        return ToResponse(issue);
+            dbContext.GameIssues.Add(issue);
+            await unitOfWork.SaveChangesAsync(ct);
+
+            return ToResponse(issue);
+        }, cancellationToken);
     }
 
     public async Task<GameIssueResponse> UpdateAsync(int id, UpdateGameIssueRequest request, CancellationToken cancellationToken)
     {
-        await using var tx = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-
-        var issue = await dbContext.GameIssues.FirstOrDefaultAsync(x => x.Id == id, cancellationToken)
-            ?? throw new KeyNotFoundException($"Game issue {id} was not found.");
-
-        if (issue.ReturnDateUtc.HasValue)
+        return await unitOfWork.ExecuteInTransactionAsync(async ct =>
         {
-            throw new InvalidOperationException("Returned issue cannot be updated again.");
-        }
+            var issue = await dbContext.GameIssues.FirstOrDefaultAsync(x => x.Id == id, ct)
+                ?? throw new KeyNotFoundException($"Game issue {id} was not found.");
 
-        var inventory = await dbContext.Inventories.FirstOrDefaultAsync(x => x.BoardGameId == issue.BoardGameId, cancellationToken)
-            ?? throw new KeyNotFoundException($"Inventory for board game {issue.BoardGameId} was not found.");
+            if (issue.ReturnDateUtc.HasValue)
+            {
+                throw new InvalidOperationException("Returned issue cannot be updated again.");
+            }
 
-        var returnDate = request.ReturnDateUtc ?? DateTime.UtcNow;
-        issue.ReturnDateUtc = returnDate;
-        issue.ConditionGivenIn = request.ConditionGivenIn;
-        issue.PhotoUrlAfterReturn = request.PhotoUrlAfterReturn?.Trim();
-        issue.UpdatedAtUtc = DateTime.UtcNow;
-        issue.ModifiedByUser = currentUserService.GetUsername();
+            var inventory = await dbContext.Inventories.FirstOrDefaultAsync(x => x.BoardGameId == issue.BoardGameId, ct)
+                ?? throw new KeyNotFoundException($"Inventory for board game {issue.BoardGameId} was not found.");
 
-        if (returnDate > issue.EndDateUtc)
-        {
-            var overdueDays = (returnDate.Date - issue.EndDateUtc.Date).Days;
-            issue.OverdueCharges = overdueDays * _businessRules.OverdueDailyFeeInr;
-            issue.Status = GameIssueStatus.Overdue;
-        }
-        else
-        {
-            issue.OverdueCharges = 0;
-            issue.Status = GameIssueStatus.Returned;
-        }
+            var returnDate = request.ReturnDateUtc ?? DateTime.UtcNow;
+            issue.ReturnDateUtc = returnDate;
+            issue.ConditionGivenIn = request.ConditionGivenIn;
+            issue.PhotoUrlAfterReturn = request.PhotoUrlAfterReturn?.Trim();
+            issue.UpdatedAtUtc = DateTime.UtcNow;
+            issue.ModifiedByUser = currentUserService.GetUsername();
 
-        var returnedCondition = request.ConditionGivenIn!.Value;
-        if (returnedCondition is GameCondition.Lost or GameCondition.Broken)
-        {
-            inventory.IsMissingOrBroken = true;
-        }
-        else
-        {
-            inventory.AvailableInventory += 1;
-        }
+            if (returnDate > issue.EndDateUtc)
+            {
+                var overdueDays = (returnDate.Date - issue.EndDateUtc.Date).Days;
+                issue.OverdueCharges = overdueDays * _businessRules.OverdueDailyFeeInr;
+                issue.Status = GameIssueStatus.Overdue;
+            }
+            else
+            {
+                issue.OverdueCharges = 0;
+                issue.Status = GameIssueStatus.Returned;
+            }
 
-        inventory.UpdatedAtUtc = DateTime.UtcNow;
-        inventory.ModifiedByUser = currentUserService.GetUsername();
+            var returnedCondition = request.ConditionGivenIn!.Value;
+            if (returnedCondition is GameCondition.Lost or GameCondition.Broken)
+            {
+                inventory.IsMissingOrBroken = true;
+            }
+            else
+            {
+                inventory.AvailableInventory += 1;
+            }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
-        await tx.CommitAsync(cancellationToken);
+            inventory.UpdatedAtUtc = DateTime.UtcNow;
+            inventory.ModifiedByUser = currentUserService.GetUsername();
 
-        return ToResponse(issue);
+            await unitOfWork.SaveChangesAsync(ct);
+
+            return ToResponse(issue);
+        }, cancellationToken);
     }
 
     public async Task<PagedResult<GameIssueResponse>> ListAsync(int page, int pageSize, CancellationToken cancellationToken)

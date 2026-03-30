@@ -8,20 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BoardGamesLibrary.Tests.Integration;
 
-public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplicationFactory>
+public class RoleAccessMatrixIntegrationTests
 {
     private const string Password = "P@ssw0rd123";
-    private readonly TestWebApplicationFactory _factory;
-
-    public RoleAccessMatrixIntegrationTests(TestWebApplicationFactory factory)
-    {
-        _factory = factory;
-    }
 
     [Fact]
     public async Task Anonymous_CanLogin_ButCannotAccessProtectedEndpoints()
     {
-        using var client = _factory.CreateClient();
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
 
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin", Password));
         var membersResponse = await client.GetAsync("/api/members");
@@ -33,7 +28,8 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
     [Fact]
     public async Task Admin_CanCreateUser()
     {
-        using var client = await CreateAuthorizedClientAsync("admin");
+        using var factory = new TestWebApplicationFactory();
+        using var client = await CreateAuthorizedClientAsync(factory, "admin");
 
         var request = new CreateUserRequest(
             "Test",
@@ -51,7 +47,8 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
     [Fact]
     public async Task Manager_CanCreateMember_AndCanCreateUser()
     {
-        using var client = await CreateAuthorizedClientAsync("manager");
+        using var factory = new TestWebApplicationFactory();
+        using var client = await CreateAuthorizedClientAsync(factory, "manager");
 
         var memberResponse = await client.PostAsJsonAsync("/api/members", new CreateMemberRequest(
             "Manager",
@@ -77,7 +74,8 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
     [Fact]
     public async Task DataEntry_HasReadOnlyOnCatalog_AndWriteOnGameIssuesOnly()
     {
-        using var client = await CreateAuthorizedClientAsync("dataentry");
+        using var factory = new TestWebApplicationFactory();
+        using var client = await CreateAuthorizedClientAsync(factory, "dataentry");
 
         var listBoardGames = await client.GetAsync("/api/boardgames");
         var listMembers = await client.GetAsync("/api/members");
@@ -97,7 +95,7 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
 
         var listUsers = await client.GetAsync("/api/users");
 
-        var gameIssueRequest = await BuildGameIssueRequestAsync();
+        var gameIssueRequest = await BuildGameIssueRequestAsync(factory);
         var createGameIssue = await client.PostAsJsonAsync("/api/gameissues", gameIssueRequest);
 
         Assert.Equal(HttpStatusCode.OK, listBoardGames.StatusCode);
@@ -108,9 +106,9 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
         Assert.Equal(HttpStatusCode.Created, createGameIssue.StatusCode);
     }
 
-    private async Task<HttpClient> CreateAuthorizedClientAsync(string username)
+    private async Task<HttpClient> CreateAuthorizedClientAsync(TestWebApplicationFactory factory, string username)
     {
-        var client = _factory.CreateClient();
+        var client = factory.CreateClient();
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest(username, Password));
         loginResponse.EnsureSuccessStatusCode();
 
@@ -120,9 +118,9 @@ public class RoleAccessMatrixIntegrationTests : IClassFixture<TestWebApplication
         return client;
     }
 
-    private async Task<CreateGameIssueRequest> BuildGameIssueRequestAsync()
+    private static async Task<CreateGameIssueRequest> BuildGameIssueRequestAsync(TestWebApplicationFactory factory)
     {
-        using var scope = _factory.Services.CreateScope();
+        using var scope = factory.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BoardGamesDbContext>();
 
         var memberId = dbContext.Members.Select(x => x.Id).First();

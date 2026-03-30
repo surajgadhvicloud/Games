@@ -18,7 +18,8 @@ public class AuthService(
     BoardGamesDbContext dbContext,
     IOptions<JwtOptions> jwtOptions,
     ICurrentUserService currentUserService,
-    IPasswordHasher<User> passwordHasher) : IAuthService
+    IPasswordHasher<User> passwordHasher,
+    IUnitOfWork unitOfWork) : IAuthService
 {
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
@@ -54,26 +55,29 @@ public class AuthService(
 
     public async Task<RefreshTokenResponse> RefreshAsync(RefreshTokenRequest request, CancellationToken cancellationToken)
     {
-        var now = DateTime.UtcNow;
-        var existing = await dbContext.RefreshTokens
-            .Include(x => x.User)
-            .FirstOrDefaultAsync(x => x.Token == request.RefreshToken, cancellationToken)
-            ?? throw new KeyNotFoundException("Refresh token was not found.");
-
-        if (existing.RevokedAtUtc.HasValue || existing.ExpiresAtUtc <= now)
+        return await unitOfWork.ExecuteInTransactionAsync(async ct =>
         {
-            throw new InvalidOperationException("Refresh token is expired or revoked.");
-        }
+            var now = DateTime.UtcNow;
+            var existing = await dbContext.RefreshTokens
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Token == request.RefreshToken, ct)
+                ?? throw new KeyNotFoundException("Refresh token was not found.");
 
-        existing.RevokedAtUtc = now;
-        existing.RevokeReason = "rotated";
+            if (existing.RevokedAtUtc.HasValue || existing.ExpiresAtUtc <= now)
+            {
+                throw new InvalidOperationException("Refresh token is expired or revoked.");
+            }
 
-        var tokenPair = await IssueTokenPairAsync(existing.User, cancellationToken);
-        return new RefreshTokenResponse(
-            tokenPair.AccessToken,
-            tokenPair.AccessTokenExpiresAtUtc,
-            tokenPair.RefreshToken,
-            tokenPair.RefreshTokenExpiresAtUtc);
+            existing.RevokedAtUtc = now;
+            existing.RevokeReason = "rotated";
+
+            var tokenPair = await IssueTokenPairAsync(existing.User, ct);
+            return new RefreshTokenResponse(
+                tokenPair.AccessToken,
+                tokenPair.AccessTokenExpiresAtUtc,
+                tokenPair.RefreshToken,
+                tokenPair.RefreshTokenExpiresAtUtc);
+        }, cancellationToken);
     }
 
     public async Task RevokeAsync(RevokeTokenRequest request, CancellationToken cancellationToken)
@@ -85,36 +89,39 @@ public class AuthService(
         {
             token.RevokedAtUtc = DateTime.UtcNow;
             token.RevokeReason = "manual-revoke";
-            await dbContext.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 
     public async Task ResetPasswordAsync(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
-        var username = NormalizeUsername(currentUserService.GetUsername());
-        var user = await dbContext.Users
-            .Include(x => x.RefreshTokens)
-            .FirstOrDefaultAsync(x => x.Username == username, cancellationToken)
-            ?? throw new KeyNotFoundException("User was not found.");
-
-        var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
-        if (verification == PasswordVerificationResult.Failed)
+        await unitOfWork.ExecuteInTransactionAsync(async ct =>
         {
-            throw new InvalidOperationException("Current password is incorrect.");
-        }
+            var username = NormalizeUsername(currentUserService.GetUsername());
+            var user = await dbContext.Users
+                .Include(x => x.RefreshTokens)
+                .FirstOrDefaultAsync(x => x.Username == username, ct)
+                ?? throw new KeyNotFoundException("User was not found.");
 
-        user.PasswordHash = passwordHasher.HashPassword(user, request.NewPassword);
-        user.UpdatedAtUtc = DateTime.UtcNow;
-        user.ModifiedByUser = username;
+            var verification = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.CurrentPassword);
+            if (verification == PasswordVerificationResult.Failed)
+            {
+                throw new InvalidOperationException("Current password is incorrect.");
+            }
 
-        var now = DateTime.UtcNow;
-        foreach (var token in user.RefreshTokens.Where(x => !x.RevokedAtUtc.HasValue && x.ExpiresAtUtc > now))
-        {
-            token.RevokedAtUtc = now;
-            token.RevokeReason = "password-reset";
-        }
+            user.PasswordHash = passwordHasher.HashPassword(user, request.NewPassword);
+            user.UpdatedAtUtc = DateTime.UtcNow;
+            user.ModifiedByUser = username;
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+            var now = DateTime.UtcNow;
+            foreach (var token in user.RefreshTokens.Where(x => !x.RevokedAtUtc.HasValue && x.ExpiresAtUtc > now))
+            {
+                token.RevokedAtUtc = now;
+                token.RevokeReason = "password-reset";
+            }
+
+            await unitOfWork.SaveChangesAsync(ct);
+        }, cancellationToken);
     }
 
     private async Task<(string AccessToken, DateTime AccessTokenExpiresAtUtc, string RefreshToken, DateTime RefreshTokenExpiresAtUtc)> IssueTokenPairAsync(
@@ -154,7 +161,7 @@ public class AuthService(
             ExpiresAtUtc = refreshTokenExpiresAtUtc
         });
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return (accessToken, expiresAtUtc, refreshTokenValue, refreshTokenExpiresAtUtc);
     }

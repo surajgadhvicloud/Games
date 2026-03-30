@@ -76,7 +76,11 @@ public class UserServiceTests
         private UserServiceHarness(BoardGamesDbContext dbContext)
         {
             DbContext = dbContext;
-            Service = new UserService(dbContext, new TestCurrentUserService(), new PasswordHasher<User>());
+            Service = new UserService(
+                dbContext,
+                new TestCurrentUserService(),
+                new PasswordHasher<User>(),
+                new UnitOfWork(dbContext));
         }
 
         public BoardGamesDbContext DbContext { get; }

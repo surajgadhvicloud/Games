@@ -24,6 +24,7 @@ public static class DependencyInjection
         services.Configure<SeederOptions>(options =>
             configuration.GetSection(SeederOptions.SectionName).Bind(options));
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IBoardGameService, BoardGameService>();
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IInventoryService, InventoryService>();

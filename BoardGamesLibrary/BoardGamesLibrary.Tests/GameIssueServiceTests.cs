@@ -208,7 +208,8 @@ public class GameIssueServiceTests
                 OverdueDailyFeeInr = 250m
             });
 
-            var service = new GameIssueService(dbContext, new TestCurrentUserService(), optionsWrapper);
+            var unitOfWork = new UnitOfWork(dbContext);
+            var service = new GameIssueService(dbContext, new TestCurrentUserService(), optionsWrapper, unitOfWork);
 
             return new TestHarness(dbContext, service)
             {

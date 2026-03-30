@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoardGamesLibrary.Infrastructure.Services;
 
-public class MemberService(BoardGamesDbContext dbContext, ICurrentUserService currentUserService) : IMemberService
+public class MemberService(
+    BoardGamesDbContext dbContext,
+    ICurrentUserService currentUserService,
+    IUnitOfWork unitOfWork) : IMemberService
 {
     public async Task<MemberResponse> CreateAsync(CreateMemberRequest request, CancellationToken cancellationToken)
     {
@@ -30,7 +33,7 @@ public class MemberService(BoardGamesDbContext dbContext, ICurrentUserService cu
         };
 
         dbContext.Members.Add(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(entity);
     }
 
@@ -55,7 +58,7 @@ public class MemberService(BoardGamesDbContext dbContext, ICurrentUserService cu
         entity.UpdatedAtUtc = DateTime.UtcNow;
         entity.ModifiedByUser = currentUserService.GetUsername();
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(entity);
     }
 

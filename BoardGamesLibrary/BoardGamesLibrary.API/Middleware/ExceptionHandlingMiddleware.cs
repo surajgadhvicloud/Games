@@ -1,4 +1,5 @@
 using FluentValidation;
+using System.Text.Json;
 
 namespace BoardGamesLibrary.API.Middleware;
 
@@ -38,6 +39,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
             detail = exception.Message
         };
 
-        await context.Response.WriteAsJsonAsync(response);
+        var payload = JsonSerializer.Serialize(response);
+        await context.Response.WriteAsync(payload);
     }
 }

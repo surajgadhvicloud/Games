@@ -6,7 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BoardGamesLibrary.Infrastructure.Services;
 
-public class InventoryService(BoardGamesDbContext dbContext, ICurrentUserService currentUserService) : IInventoryService
+public class InventoryService(
+    BoardGamesDbContext dbContext,
+    ICurrentUserService currentUserService,
+    IUnitOfWork unitOfWork) : IInventoryService
 {
     public async Task<InventoryResponse> CreateAsync(CreateInventoryRequest request, CancellationToken cancellationToken)
     {
@@ -33,7 +36,7 @@ public class InventoryService(BoardGamesDbContext dbContext, ICurrentUserService
         };
 
         dbContext.Inventories.Add(entity);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(entity);
     }
 
@@ -56,7 +59,7 @@ public class InventoryService(BoardGamesDbContext dbContext, ICurrentUserService
         entity.UpdatedAtUtc = DateTime.UtcNow;
         entity.ModifiedByUser = currentUserService.GetUsername();
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(entity);
     }
 

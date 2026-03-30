@@ -139,8 +139,9 @@ public class MemberInventoryServiceTests
         {
             DbContext = dbContext;
             var currentUserService = new TestCurrentUserService();
-            MemberService = new MemberService(dbContext, currentUserService);
-            InventoryService = new InventoryService(dbContext, currentUserService);
+            var unitOfWork = new UnitOfWork(dbContext);
+            MemberService = new MemberService(dbContext, currentUserService, unitOfWork);
+            InventoryService = new InventoryService(dbContext, currentUserService, unitOfWork);
         }
 
         public BoardGamesDbContext DbContext { get; }

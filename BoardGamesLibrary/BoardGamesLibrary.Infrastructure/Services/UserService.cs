@@ -10,7 +10,8 @@ namespace BoardGamesLibrary.Infrastructure.Services;
 public class UserService(
 	BoardGamesDbContext dbContext,
 	ICurrentUserService currentUserService,
-	IPasswordHasher<User> passwordHasher) : IUserService
+	IPasswordHasher<User> passwordHasher,
+	IUnitOfWork unitOfWork) : IUserService
 {
 	public async Task<UserResponse> CreateAsync(CreateUserRequest request, CancellationToken cancellationToken)
 	{
@@ -43,7 +44,7 @@ public class UserService(
 		entity.PasswordHash = passwordHasher.HashPassword(entity, request.Password);
 
 		dbContext.Users.Add(entity);
-		await dbContext.SaveChangesAsync(cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 		return ToResponse(entity);
 	}
 
@@ -80,7 +81,7 @@ public class UserService(
 			entity.PasswordHash = passwordHasher.HashPassword(entity, request.Password);
 		}
 
-		await dbContext.SaveChangesAsync(cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 		return ToResponse(entity);
 	}
 

@@ -5,21 +5,16 @@ using BoardGamesLibrary.Application.Contracts;
 
 namespace BoardGamesLibrary.Tests.Integration;
 
-public class RefreshTokenFlowIntegrationTests : IClassFixture<TestWebApplicationFactory>
+public class RefreshTokenFlowIntegrationTests
 {
     private const string Password = "P@ssw0rd123";
     private const string NewPassword = "N3wP@ssw0rd!";
-    private readonly TestWebApplicationFactory _factory;
-
-    public RefreshTokenFlowIntegrationTests(TestWebApplicationFactory factory)
-    {
-        _factory = factory;
-    }
 
     [Fact]
     public async Task Login_ThenRefresh_ReturnsNewTokenPair()
     {
-        using var client = _factory.CreateClient();
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
 
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("admin", Password));
         loginResponse.EnsureSuccessStatusCode();
@@ -36,7 +31,8 @@ public class RefreshTokenFlowIntegrationTests : IClassFixture<TestWebApplication
     [Fact]
     public async Task Revoke_PreventsFurtherRefresh()
     {
-        using var client = _factory.CreateClient();
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
 
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("manager", Password));
         loginResponse.EnsureSuccessStatusCode();
@@ -53,7 +49,8 @@ public class RefreshTokenFlowIntegrationTests : IClassFixture<TestWebApplication
     [Fact]
     public async Task ResetPassword_RequiresAuth_AndInvalidatesOldPassword()
     {
-        using var client = _factory.CreateClient();
+        using var factory = new TestWebApplicationFactory();
+        using var client = factory.CreateClient();
 
         var loginResponse = await client.PostAsJsonAsync("/api/auth/login", new LoginRequest("dataentry", Password));
         loginResponse.EnsureSuccessStatusCode();
