@@ -13,4 +13,4 @@ public class Inventory
     public byte[] RowVersion { get; set; } = Array.Empty<byte>();
 
     public BoardGame BoardGame { get; set; } = null!;
-}
+} 

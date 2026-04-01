@@ -34,6 +34,18 @@ public class BoardGameService(
         };
 
         dbContext.BoardGames.Add(entity);
+
+        var inventory = new Inventory
+        {
+            BoardGame = entity,
+            IsMissingOrBroken = false,
+            TotalInventory = 1,
+            AvailableInventory = 1,
+            CreatedAtUtc = DateTime.UtcNow,
+            ModifiedByUser = currentUserService.GetUsername()
+        };
+        dbContext.Inventories.Add(inventory);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return ToResponse(entity);
     }

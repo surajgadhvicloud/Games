@@ -93,7 +93,8 @@ JWT values are loaded from `appsettings.json` / `appsettings.Development.json` a
 - Added authentication with JWT + refresh tokens
 - Added core domain capabilities: Users, Members, Board Games, Inventory, Game Issues
 - Added validation with FluentValidation
-- Added automated tests with xUnit
+- Added automated tests with xUnit (23 tests: 14 unit + 9 integration)
+- Centralized persistence with Unit of Work pattern — all service SaveChanges calls routed through `IUnitOfWork`; multi-entity operations (GameIssue creation, Auth refresh/password-reset) wrapped in atomic transactions
 
 ## Roadmap (Next)
 
