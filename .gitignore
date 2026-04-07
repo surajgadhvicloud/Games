@@ -2,3 +2,5 @@
 **/*.agent.md
 .github/agents/
 .github/prompts/Readme-update.prompt.md
+
+.fake
